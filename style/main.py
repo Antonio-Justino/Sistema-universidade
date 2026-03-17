@@ -6,6 +6,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import customtkinter as ctk
 from tkinter import messagebox
 from UsersDados.CPF import verificar_cpf
+from UsersDados.data_nascimento import verificar_data
 
 # Configuração de Aparência
 ctk.set_appearance_mode("System")
@@ -25,18 +26,25 @@ class App(ctk.CTk):
         self.label_titulo.pack(pady=30)
 
         # Campos
+        #CPF
         self.criar_campo("CPF", "Ex: 000.000.000-00")
         self.entry_cpf = self.last_entry
+        self.entry_cpf.bind("<KeyRelease>", self.mascara_cpf)
         
+        #Nome
         self.criar_campo("Nome Completo", "Digite o nome do aluno")
         self.entry_nome = self.last_entry
-
+        
+        #Data de nascimento
         self.criar_campo("Data de Nascimento", "DD/MM/AAAA")
         self.entry_nasc = self.last_entry
-
+        self.entry_nasc.bind("<KeyRelease>", self.mascara_data)
+        
+        #Telefone
         self.criar_campo("Telefone", "(00) 00000-0000")
         self.entry_fone = self.last_entry
-
+        
+        #Email
         self.criar_campo("E-mail", "aluno@escola.com")
         self.entry_email = self.last_entry
 
@@ -61,6 +69,9 @@ class App(ctk.CTk):
 
         self.last_entry = entry
 
+
+
+#a partir deste ponto tudo referece a cpf
     def salvar(self):
         numero = self.entry_cpf.get()
 
@@ -68,6 +79,71 @@ class App(ctk.CTk):
             messagebox.showinfo("Validação", "CPF válido")
         else:
             messagebox.showerror("Erro", "CPF inválido")
+    
+    def mascara_cpf(self, event):
+        texto = self.entry_cpf.get()
+    
+        # remove tudo que não for número
+        numeros = "".join(filter(str.isdigit, texto))
+
+        # limita a 8 números
+        numeros = numeros[:11]
+
+        # monta a data com barras
+        novo_cpf = ""
+
+        if len(numeros) >= 3:
+            novo_cpf += numeros[:3] + "."
+            if len(numeros) >= 2:
+                novo_cpf += numeros[3:2] + "."
+                novo_cpf += numeros[2:] + "-"
+            else:
+                novo_cpf += numeros[3:]
+        else:
+            novo_cpf = numeros
+
+        # atualiza o campo
+        self.entry_cpf.delete(0, "end")
+        self.entry_cpf.insert(0, novo_cpf)
+
+
+
+
+
+
+
+#A partir deste ponto tudo referente a data de nascimento e validacao dela
+        if verificar_data(numeros):
+            messagebox.showinfo("Validação", "Data de nascimento válida")
+        else:
+            messagebox.showerror("Erro", "Data inválida")
+
+    def mascara_data(self, event):
+        texto = self.entry_nasc.get()
+        
+    
+        # remove tudo que não for número
+        numeros = "".join(filter(str.isdigit, texto))
+
+        # limita a 8 números
+        numeros = numeros[:8]
+
+        # monta a data com barras
+        nova_data = ""
+
+        if len(numeros) >= 2:
+            nova_dasta += numeros[:2] + "/"
+            if len(numeros) >= 4:
+                nova_data += numeros[2:4] + "/"
+                nova_data += numeros[4:]
+            else:
+                nova_data += numeros[2:]
+        else:
+            nova_data = numeros
+
+        # atualiza o campo
+        self.entry_nasc.delete(0, "end")
+        self.entry_nasc.insert(0, nova_data)
 
 
 if __name__ == "__main__":
