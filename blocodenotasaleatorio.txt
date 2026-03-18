@@ -12,7 +12,6 @@ from UsersDados.data_nascimento import verificar_data
 ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("blue")
 
-
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -26,25 +25,26 @@ class App(ctk.CTk):
         )
         self.label_titulo.pack(pady=30)
 
-        # CPF
+        # Campos
+        #CPF
         self.criar_campo("CPF", "Ex: 000.000.000-00")
         self.entry_cpf = self.last_entry
         self.entry_cpf.bind("<KeyRelease>", self.mascara_cpf)
-
-        # Nome
+        
+        #Nome
         self.criar_campo("Nome Completo", "Digite o nome do aluno")
         self.entry_nome = self.last_entry
-
-        # Data de nascimento
+        
+        #Data de nascimento
         self.criar_campo("Data de Nascimento", "DD/MM/AAAA")
         self.entry_nasc = self.last_entry
         self.entry_nasc.bind("<KeyRelease>", self.mascara_data)
-
-        # Telefone
+        
+        #Telefone
         self.criar_campo("Telefone", "(00) 00000-0000")
         self.entry_fone = self.last_entry
-
-        # Email
+        
+        #Email
         self.criar_campo("E-mail", "aluno@escola.com")
         self.entry_email = self.last_entry
 
@@ -69,36 +69,54 @@ class App(ctk.CTk):
 
         self.last_entry = entry
 
-    #CPF
-    def mascara_cpf(self, event):
-        texto = self.entry_cpf.get()
-        numeros = "".join(filter(str.isdigit, texto))[:11]
 
-        novo_cpf = ""
 
-        if len(numeros) >= 3:
-            novo_cpf += numeros[:3] + "."
-            if len(numeros) >= 6:
-                novo_cpf += numeros[3:6] + "."
-                if len(numeros) >= 9:
-                    novo_cpf += numeros[6:9] + "-"
-                    novo_cpf += numeros[9:]
-                else:
-                    novo_cpf += numeros[6:]
+#a partir deste ponto tudo referece a cpf
+def mascara_cpf(self, event):
+    texto = self.entry_cpf.get()
+    numeros = "".join(filter(str.isdigit, texto))[:11]
+
+    novo_cpf = ""
+
+    if len(numeros) >= 3:
+        novo_cpf += numeros[:3] + "."
+        if len(numeros) >= 6:
+            novo_cpf += numeros[3:6] + "."
+            if len(numeros) >= 9:
+                novo_cpf += numeros[6:9] + "-"
+                novo_cpf += numeros[9:]
             else:
-                novo_cpf += numeros[3:]
+                novo_cpf += numeros[6:]
         else:
-            novo_cpf = numeros
+            novo_cpf += numeros[3:]
+    else:
+        novo_cpf = numeros
 
-        self.entry_cpf.delete(0, "end")
-        self.entry_cpf.insert(0, novo_cpf)
+    self.entry_cpf.delete(0, "end")
+    self.entry_cpf.insert(0, novo_cpf)
 
-    #DATA
+
+
+
+
+
+#A partir deste ponto tudo referente a data de nascimento e validacao dela
+        if verificar_data(numeros):
+            messagebox.showinfo("Validação", "Data de nascimento válida")
+        else:
+            messagebox.showerror("Erro", "Data inválida")
+
     def mascara_data(self, event):
         texto = self.entry_nasc.get()
+        
+    
+        # remove tudo que não for número
+        numeros = "".join(filter(str.isdigit, texto))
 
-        numeros = "".join(filter(str.isdigit, texto))[:8]
+        # limita a 8 números
+        numeros = numeros[:8]
 
+        # monta a data com barras
         nova_data = ""
 
         if len(numeros) >= 2:
@@ -111,23 +129,9 @@ class App(ctk.CTk):
         else:
             nova_data = numeros
 
+        # atualiza o campo
         self.entry_nasc.delete(0, "end")
         self.entry_nasc.insert(0, nova_data)
-
-    #SALVAR 
-    def salvar(self):
-        cpf = self.entry_cpf.get()
-        data = self.entry_nasc.get()
-
-        if not verificar_cpf(cpf):
-            messagebox.showerror("Erro", "CPF inválido")
-            return
-
-        if not verificar_data(data):
-            messagebox.showerror("Erro", "Data de nascimento inválida")
-            return
-
-        messagebox.showinfo("Sucesso", "Dados válidos")
 
 
 if __name__ == "__main__":
