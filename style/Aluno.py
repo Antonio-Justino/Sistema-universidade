@@ -2,6 +2,8 @@ import customtkinter as ctk
 from tkinter import messagebox
 import sys
 import os
+import re
+import requests
 
 # Configurações globais (opcional, já que o main.py também as terá)
 ctk.set_appearance_mode("System")
