@@ -1,7 +1,5 @@
 import customtkinter as ctk
 from tkinter import messagebox
-import sys
-import os
 import re
 import requests
 

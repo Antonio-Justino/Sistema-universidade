@@ -1,34 +1,33 @@
 import customtkinter as ctk
 from datetime import datetime
-from tkinter import messagebox
 import os
 
 # --- IMPORTAÇÕES DAS SUAS TELAS ---
 try:
-    from style.Cadastro import cadluno
+    from alunos import TelaAlunos
 except ImportError:
-    cadluno = None
-    print("Aviso: Arquivo Cadastro.py não encontrado.")
+    TelaAlunos = None
+    print("Aviso: Arquivo alunos.py não encontrado.")
 
 try:
-    import disciplinas
+    import style.cursos as cursos
 except ImportError:
     class Dummy: TelaDisciplinas = None
     disciplinas = Dummy()
     print("Aviso: Arquivo disciplinas.py não encontrado.")
 
 try:
-    from Professores import TelaProfessores
+    from dadosprof import TelaProfessores
 except ImportError:
     TelaProfessores = None
-    print("Aviso: Arquivo Professores.py não encontrado.")
+    print("Aviso: Arquivo professores.py não encontrado.")
 
 # --- NOVO: IMPORTAÇÃO DE CURSOS ---
 try:
-    from Cursos import TelaCursos
+    from style.cursos import TelaCursos # Importa a classe do arquivo que criamos
 except ImportError:
     TelaCursos = None
-    print("Aviso: Arquivo Cursos.py não encontrado.")
+    print("Aviso: Arquivo cursos.py não encontrado.")
 
 class Dashboard(ctk.CTk):
     def __init__(self):
@@ -43,7 +42,7 @@ class Dashboard(ctk.CTk):
         y = (self.winfo_screenheight() // 2) - (altura // 2)
         self.geometry(f"{largura}x{altura}+{x}+{y}")
 
-        ctk.CTkLabel(self, text="SISTEMA DE GESTÃO ACADÊMICA",
+        ctk.CTkLabel(self, text="SISTEMA DE GESTÃO ACADÊMICA", 
                      font=("Roboto", 24, "bold")).pack(pady=30)
 
         self.frame_botoes = ctk.CTkFrame(self, fg_color="transparent")
@@ -52,16 +51,16 @@ class Dashboard(ctk.CTk):
 
         # --- LISTA DE BOTÕES ATUALIZADA ---
         botoes = [
-            ("CADASTRAR ALUNOS", self.abrir_app),
+            ("CADASTRAR ALUNOS", self.abrir_alunos),
             ("CADASTRAR DISCIPLINAS", self.abrir_disciplinas),
             ("CADASTRAR PROFESSORES", self.abrir_professores),
-            ("CADASTRAR CURSOS", self.abrir_cursos),
-            ("CADASTRAR TURMAS", self.abrir_turmas),
-            ("MATRÍCULAS", self.abrir_matriculas),
+            ("CADASTRAR CURSOS", self.abrir_cursos), # MODIFICADO: Agora chama o método
+            ("CADASTRAR TURMAS", None),
+            ("MATRÍCULAS", None),
         ]
 
         for i, (texto, comando) in enumerate(botoes):
-            btn = ctk.CTkButton(self.frame_botoes, text=texto,
+            btn = ctk.CTkButton(self.frame_botoes, text=texto, 
                                 command=comando,
                                 height=50, font=("Roboto", 14, "bold"))
             btn.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="ew")
@@ -86,17 +85,15 @@ class Dashboard(ctk.CTk):
         self.after(1000, self.atualizar_relogio)
 
     # --- MÉTODOS DE ABERTURA ---
-    def abrir_app(self):
-        if cadluno:
-            cadluno(self)
-        else:
-            print("Erro: Tela de Alunos não carregada.")
+    def abrir_alunos(self):
+        if TelaAlunos:
+            TelaAlunos(self)
+        else: print("Erro: Tela de Alunos não carregada.")
 
     def abrir_disciplinas(self):
         if hasattr(disciplinas, 'TelaDisciplinas') and disciplinas.TelaDisciplinas:
             disciplinas.TelaDisciplinas(self)
-        else:
-            print("Erro: Tela de Disciplinas não carregada.")
+        else: print("Erro: Tela de Disciplinas não carregada.")
 
     def abrir_professores(self):
         if TelaProfessores:
@@ -104,24 +101,13 @@ class Dashboard(ctk.CTk):
         else:
             print("Erro: Tela de Professores não carregada.")
 
+    # --- NOVO MÉTODO PARA CURSOS ---
     def abrir_cursos(self):
         if TelaCursos:
-            TelaCursos(self)
+            TelaCursos(self) # Abre a janela de cursos como Toplevel
         else:
             messagebox.showerror("Erro de Sistema", "Arquivo cursos.py não encontrado ou classe TelaCursos não definida.")
-            
-    def abrir_disciplinas(self):
-        from disciplinas import TelaDisciplinas
-        TelaDisciplinas(self)
-        
-    def abrir_turmas(self):
-        from turmas import TelaTurmas
-        TelaTurmas(self)
-        
-    def abrir_matriculas(self):
-        from matriculas import TelaMatriculas
-        TelaMatriculas(self)
-    
+
 if __name__ == "__main__":
     app = Dashboard()
     app.mainloop()

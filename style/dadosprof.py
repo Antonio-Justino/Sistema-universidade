@@ -1,9 +1,13 @@
+#CADASTRO PROFESSORES
+
 import customtkinter as ctk
 from tkinter import messagebox
-import sys
-import os
+import re
+import requests
+from UsersDados.CPF import verificar_cpf
+from UsersDados.data_nascimento import verificar_data
 # IMPORTANTE: Importa a segunda tela do seu outro arquivo
-from professores_dadosacad import TelaDadosAcad 
+#from professores_dadosacad import TelaDadosAcad 
 
 class TelaProfessores(ctk.CTkToplevel):
     def __init__(self, parent):
@@ -28,7 +32,7 @@ class TelaProfessores(ctk.CTkToplevel):
 
         # --- SEÇÃO DE CAMPOS ---
         self.entry_cpf = self.criar_campo("CPF *", "000.000.000-00")
-        self.entry_cpf.bind("<FocusOut>", self.validar_ao_sair_cpf) 
+        self.entry_cpf.bind("<FocusOut>", self.verificar_cpf) 
         
         self.entry_nome = self.criar_campo("Nome Completo *", "Nome do professor")
         self.entry_nasc = self.criar_campo("Data de Nascimento *", "DD/MM/AAAA")
@@ -246,4 +250,50 @@ class TelaDadosAcad(ctk.CTkToplevel):
         # Sucesso: Informa o usuário e 'mata' a janela para voltar à principal.
         messagebox.showinfo("Módulo Acadêmico", "Dados capturados com sucesso!")
         self.destroy()
+
+#CPF
+    def mascara_cpf(self, event):
+        texto = self.entry_cpf.get()
+        numeros = "".join(filter(str.isdigit, texto))[:11]
+
+        novo_cpf = ""
+
+        if len(numeros) >= 3:
+            novo_cpf += numeros[:3] + "."
+            if len(numeros) >= 6:
+                novo_cpf += numeros[3:6] + "."
+                if len(numeros) >= 9:
+                    novo_cpf += numeros[6:9] + "-"
+                    novo_cpf += numeros[9:]
+                else:
+                    novo_cpf += numeros[6:]
+            else:
+                novo_cpf += numeros[3:]
+        else:
+            novo_cpf = numeros
+
+        self.entry_cpf.delete(0, "end")
+        self.entry_cpf.insert(0, novo_cpf)
+
+    #DATA
+    def mascara_data(self, event):
+        texto = self.entry_nasc.get()
+
+        numeros = "".join(filter(str.isdigit, texto))[:8]
+
+        nova_data = ""
+
+        if len(numeros) >= 2:
+            nova_data += numeros[:2] + "/"
+            if len(numeros) >= 4:
+                nova_data += numeros[2:4] + "/"
+                nova_data += numeros[4:]
+            else:
+                nova_data += numeros[2:]
+        else:
+            nova_data = numeros
+
+        self.entry_nasc.delete(0, "end")
+        self.entry_nasc.insert(0, nova_data)
+
 
