@@ -1,57 +1,256 @@
-#CPF
-    def mascara_cpf(self, event):
-        texto = self.entry_cpf.get()
-        numeros = "".join(filter(str.isdigit, texto))[:11]
+import customtkinter as ctk
+from tkinter import ttk
 
-        novo_cpf = ""
-
-        if len(numeros) >= 3:
-            novo_cpf += numeros[:3] + "."
-            if len(numeros) >= 6:
-                novo_cpf += numeros[3:6] + "."
-                if len(numeros) >= 9:
-                    novo_cpf += numeros[6:9] + "-"
-                    novo_cpf += numeros[9:]
-                else:
-                    novo_cpf += numeros[6:]
-            else:
-                novo_cpf += numeros[3:]
-        else:
-            novo_cpf = numeros
-
-        self.entry_cpf.delete(0, "end")
-        self.entry_cpf.insert(0, novo_cpf)
-
-    #DATA
-    def mascara_data(self, event):
-        texto = self.entry_nasc.get()
-
-        numeros = "".join(filter(str.isdigit, texto))[:8]
-
-        nova_data = ""
-
-        if len(numeros) >= 2:
-            nova_data += numeros[:2] + "/"
-            if len(numeros) >= 4:
-                nova_data += numeros[2:4] + "/"
-                nova_data += numeros[4:]
-            else:
-                nova_data += numeros[2:]
-        else:
-            nova_data = numeros
-
-        self.entry_nasc.delete(0, "end")
-        self.entry_nasc.insert(0, nova_data)
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
 
 
+class TelaProfessor(ctk.CTkToplevel):
+    def __init__(self, parent=None, nome_professor="Professor"):
+        super().__init__(parent)
+
+        self.title("Área do Professor")
+        self.geometry("1000x600")
+        self.resizable(False, False)
+
+        self.nome_professor = nome_professor
+
+        self.criar_layout()
+
+    def criar_layout(self):
+        # Menu lateral
+        self.menu = ctk.CTkFrame(self, width=220, corner_radius=0)
+        self.menu.pack(side="left", fill="y")
+
+        titulo = ctk.CTkLabel(
+            self.menu,
+            text="Área do Professor",
+            font=("Arial", 22, "bold")
+        )
+        titulo.pack(pady=30)
+
+        ctk.CTkButton(
+            self.menu,
+            text="Minhas Turmas",
+            command=self.mostrar_turmas
+        ).pack(pady=10, padx=20, fill="x")
+
+        ctk.CTkButton(
+            self.menu,
+            text="Alunos",
+            command=self.mostrar_alunos
+        ).pack(pady=10, padx=20, fill="x")
+
+        ctk.CTkButton(
+            self.menu,
+            text="Lançar Notas",
+            command=self.mostrar_notas
+        ).pack(pady=10, padx=20, fill="x")
+
+        ctk.CTkButton(
+            self.menu,
+            text="Atividades",
+            command=self.mostrar_atividades
+        ).pack(pady=10, padx=20, fill="x")
+
+        ctk.CTkButton(
+            self.menu,
+            text="Sair",
+            fg_color="red",
+            hover_color="#8B0000",
+            command=self.destroy
+        ).pack(side="bottom", pady=30, padx=20, fill="x")
+
+        # Área principal
+        self.area = ctk.CTkFrame(self)
+        self.area.pack(side="right", expand=True, fill="both", padx=20, pady=20)
+
+        self.mostrar_inicio()
+
+    def limpar_area(self):
+        for widget in self.area.winfo_children():
+            widget.destroy()
+
+    def mostrar_inicio(self):
+        self.limpar_area()
+
+        ctk.CTkLabel(
+            self.area,
+            text=f"Bem-vindo, {self.nome_professor}",
+            font=("Arial", 30, "bold")
+        ).pack(pady=40)
+
+        ctk.CTkLabel(
+            self.area,
+            text="Aqui você pode acessar suas turmas, alunos, notas e atividades.",
+            font=("Arial", 18)
+        ).pack(pady=10)
+
+    def mostrar_turmas(self):
+        self.limpar_area()
+
+        ctk.CTkLabel(
+            self.area,
+            text="Minhas Turmas",
+            font=("Arial", 28, "bold")
+        ).pack(pady=20)
+
+        turmas = [
+            ("ADS 1º Período", "Algoritmos", "35 alunos"),
+            ("ADS 2º Período", "Banco de Dados", "28 alunos"),
+            ("SI 1º Período", "Matemática Discreta", "32 alunos"),
+            ("Eng. Software", "Estrutura de Dados", "25 alunos"),
+        ]
+
+        for nome, materia, qtd in turmas:
+            card = ctk.CTkFrame(self.area)
+            card.pack(pady=8, padx=30, fill="x")
+
+            ctk.CTkLabel(
+                card,
+                text=nome,
+                font=("Arial", 19, "bold")
+            ).pack(anchor="w", padx=15, pady=(10, 0))
+
+            ctk.CTkLabel(
+                card,
+                text=f"Matéria: {materia} | {qtd}",
+                font=("Arial", 15)
+            ).pack(anchor="w", padx=15, pady=(5, 10))
+
+    def mostrar_alunos(self):
+        self.limpar_area()
+
+        ctk.CTkLabel(
+            self.area,
+            text="Lista de Alunos",
+            font=("Arial", 28, "bold")
+        ).pack(pady=20)
+
+        colunas = ("Nome", "Curso", "Turma", "Status")
+
+        tabela = ttk.Treeview(self.area, columns=colunas, show="headings", height=12)
+
+        for coluna in colunas:
+            tabela.heading(coluna, text=coluna)
+            tabela.column(coluna, width=160, anchor="center")
+
+        alunos = [
+            ("Antônio Justino", "ADS", "1º Período", "Ativo"),
+            ("Lucas Silva", "ADS", "1º Período", "Ativo"),
+            ("Mariana Costa", "SI", "1º Período", "Ativo"),
+            ("João Pedro", "ADS", "2º Período", "Ativo"),
+            ("Ana Clara", "Eng. Software", "3º Período", "Ativo"),
+        ]
+
+        for aluno in alunos:
+            tabela.insert("", "end", values=aluno)
+
+        tabela.pack(pady=20)
+
+    def mostrar_notas(self):
+        self.limpar_area()
+
+        ctk.CTkLabel(
+            self.area,
+            text="Lançar Notas",
+            font=("Arial", 28, "bold")
+        ).pack(pady=20)
+
+        form = ctk.CTkFrame(self.area)
+        form.pack(pady=10, padx=30, fill="x")
+
+        self.entry_aluno = ctk.CTkEntry(form, placeholder_text="Nome do aluno")
+        self.entry_aluno.pack(pady=10, padx=20, fill="x")
+
+        self.entry_materia = ctk.CTkEntry(form, placeholder_text="Matéria")
+        self.entry_materia.pack(pady=10, padx=20, fill="x")
+
+        self.entry_nota1 = ctk.CTkEntry(form, placeholder_text="Nota 1")
+        self.entry_nota1.pack(pady=10, padx=20, fill="x")
+
+        self.entry_nota2 = ctk.CTkEntry(form, placeholder_text="Nota 2")
+        self.entry_nota2.pack(pady=10, padx=20, fill="x")
+
+        ctk.CTkButton(
+            form,
+            text="Salvar Nota",
+            command=self.salvar_nota
+        ).pack(pady=15)
+
+        self.label_resultado = ctk.CTkLabel(
+            self.area,
+            text="",
+            font=("Arial", 16)
+        )
+        self.label_resultado.pack(pady=10)
+
+    def salvar_nota(self):
+        aluno = self.entry_aluno.get()
+        materia = self.entry_materia.get()
+        nota1 = self.entry_nota1.get()
+        nota2 = self.entry_nota2.get()
+
+        if aluno == "" or materia == "" or nota1 == "" or nota2 == "":
+            self.label_resultado.configure(text="Preencha todos os campos.")
+            return
+
+        try:
+            nota1 = float(nota1)
+            nota2 = float(nota2)
+            media = (nota1 + nota2) / 2
+
+            situacao = "Aprovado" if media >= 6 else "Reprovado"
+
+            self.label_resultado.configure(
+                text=f"Nota salva: {aluno} | {materia} | Média: {media:.2f} | {situacao}"
+            )
+
+            self.entry_aluno.delete(0, "end")
+            self.entry_materia.delete(0, "end")
+            self.entry_nota1.delete(0, "end")
+            self.entry_nota2.delete(0, "end")
+
+        except ValueError:
+            self.label_resultado.configure(text="Digite notas válidas.")
+
+    def mostrar_atividades(self):
+        self.limpar_area()
+
+        ctk.CTkLabel(
+            self.area,
+            text="Atividades e Estudos",
+            font=("Arial", 28, "bold")
+        ).pack(pady=20)
+
+        atividades = [
+            ("Algoritmos", "Lista de exercícios sobre funções."),
+            ("Banco de Dados", "Atividade prática com SELECT e JOIN."),
+            ("Matemática Discreta", "Exercícios sobre lógica proposicional."),
+            ("Estrutura de Dados", "Trabalho sobre pilhas e filas."),
+        ]
+
+        for materia, descricao in atividades:
+            card = ctk.CTkFrame(self.area)
+            card.pack(pady=10, padx=30, fill="x")
+
+            ctk.CTkLabel(
+                card,
+                text=materia,
+                font=("Arial", 20, "bold")
+            ).pack(anchor="w", padx=15, pady=(10, 0))
+
+            ctk.CTkLabel(
+                card,
+                text=descricao,
+                font=("Arial", 15)
+            ).pack(anchor="w", padx=15, pady=(5, 10))
 
 
+# Teste da tela separada
+if __name__ == "__main__":
+    app = ctk.CTk()
+    app.withdraw()
 
-import sys
-import os
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-
-from UsersDados.CPF import verificar_cpf
-from UsersDados.data_nascimento import verificar_data
+    tela = TelaProfessor(app, nome_professor="Carlos")
+    app.mainloop()
